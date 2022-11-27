@@ -1,8 +1,10 @@
 const productos = document.getElementById('productos')
 const items = document.getElementById('items')
+const footer = document.getElementById('footer')
 const fragment = document.createDocumentFragment()
 const templateProductos = document.getElementById("template-productos").content
 const templateItems = document.getElementById("template-items").content
+const templateFooter = document.getElementById("template-footer").content
 
 let carrito = {}
 
@@ -63,4 +65,20 @@ const pintarProductos = () => {
         fragment.appendChild(clone)
     })
     items.appendChild(fragment)
+    pintarFooter()
+}
+
+const pintarFooter = () =>{
+    footer.innerHTML=''
+    
+    const cantidad_productos = Object.values(carrito).reduce((acc,{cantidad})=> acc + cantidad,0)
+    const valor_total = Object.values(carrito).reduce((acc,{cantidad, precio})=> acc + cantidad * precio,0)
+    
+    templateFooter.querySelectorAll('td')[0].textContent=cantidad_productos
+    templateFooter.querySelectorAll('span')[0].textContent=valor_total
+
+    const clone = templateFooter.cloneNode(true)
+    fragment.appendChild(clone)
+
+    footer.appendChild(fragment)
 }

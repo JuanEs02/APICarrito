@@ -13,18 +13,23 @@
 <body>
     <div class="container">
         <h4>Productos</h4>
-            <div class="row" id="productos"></div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Item</th>
-                        <th scope="col">Cantidad</th>
-                        <th scope="col">Acción</th>
-                        <th scope="col">Total</th>
-                        </tr>
-                    </thead>
-                <tbody id="items"></tbody>
+        <div class="row" id="productos"></div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Item</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Acción</th>
+                    <th scope="col">Total</th>
+                </tr>
+            </thead>
+            <tbody id="items"></tbody>
+            <tfoot>
+                <tr id="footer">
+                    <th scoper="row" colspan="5">No hay productos en el carrito</th>
+                </tr>
+            </tfoot>
         </table>
     </div>
 
@@ -32,7 +37,7 @@
         <div class="col-2 mb-4">
             <div class="card">
                 <img src="" alt="" class="card-img-top"
-                style="min-width: 150px; max-width: 150px; min-height: 150px; max-height: 200px;">
+                    style="min-width: 150px; max-width: 150px; min-height: 150px; max-height: 200px;">
                 <div class="card-body">
                     <h5>Titulo</h5>
                     <p>$ <span>Precio</span></p>
@@ -55,6 +60,13 @@
         </tr>
     </template>
 
+    <template id="template-footer">
+        <th scope="row" colspan="2">Total Productos</th>
+        <td></td>
+        <td class="font-weight-bold">$<span>5000</span></td>
+    </template>
+
     <script src="app.js"></script>
 </body>
+
 </html>
