@@ -1,7 +1,12 @@
 const productos = document.getElementById('productos')
 const fragment = document.createDocumentFragment()
+const templateProductos = document.getElementById("template-productos").content
+let carrito = {}
 
 document.addEventListener('DOMContentLoaded', e => { fetchData() })
+productos.addEventListener('click', e=>{agregarCarro(e)})
+
+
 const fetchData = async () => {
     const rest = await fetch('api.json')
     const data = await rest.json()
@@ -9,7 +14,6 @@ const fetchData = async () => {
 }
 
 const pintarCards = data => {
-    const templateProductos = document.getElementById("template-productos").content
 
     data.forEach(item => {
         templateProductos.querySelector('h5').textContent = item.titulo;
@@ -20,4 +24,18 @@ const pintarCards = data => {
         fragment.appendChild(clone)
     })
     productos.appendChild(fragment)
+}
+
+const agregarCarro = e =>{
+    llenarCarro(e.target.parentElement);
+}
+
+const llenarCarro = item =>{
+    const producto = {
+        id: item.querySelector('button').dataset.id,
+        precio: item.querySelector('p').textContent,
+        titulo: item.querySelector('h5').textContent,
+        cantidad: 1
+    }
+    console.log(producto)
 }
