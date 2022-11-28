@@ -10,22 +10,44 @@ let carrito = {};
 let data = [];
 let personajes = {};
 let api = [];
+let charactersList = [];
 
 document.addEventListener('DOMContentLoaded', e => { fetchData() })
 document.addEventListener('click', e => { agregarCarrito(e) })
+document.addEventListener('click', e => { eliminarPersonaje(e) })
+
 items.addEventListener('click', e => { btnAgregarEliminarProductos(e) })
 
+const editarPersonaje = () => {
+
+    const idPersonaje = document.getElementById("id").value;
+    const nombrePersonaje = document.getElementById("nombre").value;
+    const precioPesonaje = document.getElementById("precio").value;
+    const imagenPersonaje = document.getElementById("imagen").value;
+
+    personajes[parseInt(idP)-1].id = idP
+    personajes[parseInt(idP)-1].name = nombre
+    personajes[parseInt(idP)-1].image = imagen
+    personajes[parseInt(idP)-1].precio = precio
+    console.log(idP + nombre + imagen + precio);
+    productos.innerHTML="";
+    pintarCards();
+    agregar.style.display= 'block';
+    editar.style.display= 'none';
+    limpiar();
+
+}
 const fetchData = async () => {
     const res = await fetch('https://api.disneyapi.dev/characters');
     const data = await res.json();
     addPrice(data.data);
-    let charactersList = [];
 
-    for (let index = 0; index < 10; index++) {
+
+    for (let index = 0; index < 12; index++) {
         charactersList.push(data.data[index])
     }
 
-    console.log(data.data);
+    console.log(charactersList);
     // crearPersonaje();
     pintarCards(charactersList);
 }
@@ -34,18 +56,11 @@ function random(max) {
     return Math.floor(Math.random() * max);
 }
 
-/*function crearPersonaje() {
-    api.forEach((data, index) => {
 
-        const precio = random(200);
-        let { _id, name, imageUrl } = data;
-        const charactersList = { "_id": _id, "name": name, "imageUrl": imageUrl, "precio": precio };
-        console.log(charactersList);
-        personajes = Object.assign({}, charactersList);
-
-    })
+const borrarPesonaje = () => {
+    console.log('element');
 }
-*/
+
 const addPrice = (data) => {
 
     data.forEach((character) => {
@@ -56,16 +71,18 @@ const addPrice = (data) => {
 }
 
 const pintarCards = data => {
-    Object.values(data).forEach((item, index) => {
-        console.log(index);
-        if (index < 10) {
-            templateProductos.querySelector('h5').textContent = item.name;
-            templateProductos.querySelector('span').textContent = item.precio;
-            templateProductos.querySelector('img').setAttribute("src", item.imageUrl)
-            templateProductos.querySelector('button').dataset.id = item._id;
-            const clone = templateProductos.cloneNode(true);
-            fragment.appendChild(clone);
-        }
+
+    productos.innerHTML = '';
+    Object.values(data).forEach((item) => {
+
+        templateProductos.querySelector('h5').textContent = item.name;
+        templateProductos.querySelector('span').textContent = item.precio;
+        templateProductos.querySelector('img').setAttribute("src", item.imageUrl)
+        templateProductos.querySelector('button').dataset.id = item._id;
+        templateProductos.querySelector('.btn-danger').dataset.id = item._id;
+        const clone = templateProductos.cloneNode(true);
+        fragment.appendChild(clone);
+
     })
     productos.appendChild(fragment);
 }
@@ -73,6 +90,15 @@ const pintarCards = data => {
 const agregarCarrito = e => {
     if (e.target.classList.contains('btn-dark')) {
         llenarCarro(e.target.parentElement)
+    }
+    e.stopPropagation();
+}
+
+const eliminarPersonaje = e => {
+    if (e.target.classList.contains('btn-danger')) {
+        charactersList = charactersList.filter(element => element._id != e.target.dataset.id);
+        console.log(charactersList);
+        pintarCards(charactersList);
     }
     e.stopPropagation();
 }
