@@ -15,28 +15,103 @@ let charactersList = [];
 document.addEventListener('DOMContentLoaded', e => { fetchData() })
 document.addEventListener('click', e => { agregarCarrito(e) })
 document.addEventListener('click', e => { eliminarPersonaje(e) })
+document.addEventListener('click', e => { editarPersonaje(e) })
+document.addEventListener('click', e => { guardarPersonaje(e) })
+
+function isAllComplete(id, nombre, imagen, precio) {
+
+    if (!id.trim()) {
+        alert('Completa la Id')
+        return false;
+    }
+
+    if (!nombre.trim()) {
+        alert('Completa el nombre')
+        return false;
+    }
+    if (!imagen.trim()) {
+        alert('Completa la url de la imagen')
+        return false;
+    }
+    if (!precio.trim()) {
+        alert('Completa el precio')
+        return false;
+    }
+
+    return true;
+}
+
+function isPositiveNumber(name,number) {
+
+    if (number>1) {
+        alert("Numero no valido en "+name)
+        return false;
+    }
+
+    return true;
+}
 
 items.addEventListener('click', e => { btnAgregarEliminarProductos(e) })
 
-const editarPersonaje = () => {
+const editarPersonaje = (e) => {
+    let personaje = charactersList.filter(element => element._id == e.target.dataset.id)[0];
 
-    const idPersonaje = document.getElementById("id").value;
-    const nombrePersonaje = document.getElementById("nombre").value;
-    const precioPesonaje = document.getElementById("precio").value;
-    const imagenPersonaje = document.getElementById("imagen").value;
-
-    personajes[parseInt(idP)-1].id = idP
-    personajes[parseInt(idP)-1].name = nombre
-    personajes[parseInt(idP)-1].image = imagen
-    personajes[parseInt(idP)-1].precio = precio
-    console.log(idP + nombre + imagen + precio);
-    productos.innerHTML="";
-    pintarCards();
-    agregar.style.display= 'block';
-    editar.style.display= 'none';
-    limpiar();
+    if (e.target.classList.contains('btn-primary')) {
+        document.getElementById("id").value = personaje._id;
+        document.getElementById("nombre").value = personaje.name;
+        document.getElementById("imagen").value = personaje.imageUrl;
+        document.getElementById("precio").value = personaje.precio;
+    }
+    e.stopPropagation();
 
 }
+
+const guardarPersonaje = (e) => {
+
+    if (e.target.classList.contains('btn-success')) {
+        const idPersonaje = document.getElementById("id").value;
+        const nombrePersonaje = document.getElementById("nombre").value;
+        const precioPesonaje = document.getElementById("precio").value;
+        const imagenPersonaje = document.getElementById("imagen").value;
+        if (!isAllComplete(idPersonaje, nombrePersonaje, imagenPersonaje, precioPesonaje)
+        ||!isPositiveNumber(idPersonaje,"id")||!isPositiveNumber(precioPesonaje,"precio")) {
+            return;
+        }
+
+        let personaje = charactersList.filter(
+            element => element._id == idPersonaje
+        );
+        if (personaje.length == 0) {
+            let personajeNuevo = {};
+            personajeNuevo._id = idPersonaje;
+            personajeNuevo.name = nombrePersonaje;
+            personajeNuevo.imageUrl = imagenPersonaje;
+            personajeNuevo.precio = precioPesonaje;
+            charactersList.push(personajeNuevo);
+            alert('Información guardada');
+        } else {
+            let personaje = charactersList.filter(
+                element => element._id == idPersonaje
+            )[0];
+            personaje._id = idPersonaje;
+            personaje.name = nombrePersonaje;
+            personaje.imageUrl = imagenPersonaje;
+            personaje.precio = precioPesonaje;
+            let valueIndex = 0;
+            charactersList.forEach((element, index) => {
+                if (element._id == idPersonaje) {
+                    valueIndex = index;
+                }
+            });
+            alert('Información editada');
+            charactersList[valueIndex] = personaje;
+        }
+        pintarCards(charactersList);
+        limpiar();
+    }
+
+}
+
 const fetchData = async () => {
     const res = await fetch('https://api.disneyapi.dev/characters');
     const data = await res.json();
@@ -46,19 +121,11 @@ const fetchData = async () => {
     for (let index = 0; index < 12; index++) {
         charactersList.push(data.data[index])
     }
-
-    console.log(charactersList);
-    // crearPersonaje();
     pintarCards(charactersList);
 }
 
 function random(max) {
     return Math.floor(Math.random() * max);
-}
-
-
-const borrarPesonaje = () => {
-    console.log('element');
 }
 
 const addPrice = (data) => {
@@ -80,6 +147,8 @@ const pintarCards = data => {
         templateProductos.querySelector('img').setAttribute("src", item.imageUrl)
         templateProductos.querySelector('button').dataset.id = item._id;
         templateProductos.querySelector('.btn-danger').dataset.id = item._id;
+        templateProductos.querySelector('.btn-primary').dataset.id = item._id;
+        templateProductos.querySelector('h4').textContent = item._id;
         const clone = templateProductos.cloneNode(true);
         fragment.appendChild(clone);
 
@@ -87,6 +156,13 @@ const pintarCards = data => {
     productos.appendChild(fragment);
 }
 
+
+const limpiar = () => {
+    document.getElementById("id").value = '';
+    document.getElementById("nombre").value = '';
+    document.getElementById("imagen").value = '';
+    document.getElementById("precio").value = '';
+}
 const agregarCarrito = e => {
     if (e.target.classList.contains('btn-dark')) {
         llenarCarro(e.target.parentElement)
@@ -97,7 +173,6 @@ const agregarCarrito = e => {
 const eliminarPersonaje = e => {
     if (e.target.classList.contains('btn-danger')) {
         charactersList = charactersList.filter(element => element._id != e.target.dataset.id);
-        console.log(charactersList);
         pintarCards(charactersList);
     }
     e.stopPropagation();
@@ -116,7 +191,6 @@ const llenarCarro = item => {
     carrito[producto.id] = { ...producto }
     pintarProductos();
 }
-
 const pintarProductos = () => {
     items.innerHTML = '';
     Object.values(carrito).forEach(producto => {
@@ -162,7 +236,6 @@ const btnAgregarEliminarProductos = e => {
         carrito[e.target.dataset.id] = { ...producto }
         pintarProductos();
     }
-
     if (e.target.classList.contains('btn-danger')) {
         const producto = carrito[e.target.dataset.id]
         producto.cantidad--;

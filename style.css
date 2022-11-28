@@ -1,0 +1,7 @@
+.topbanner {
+    background: url("https://mdn.mozillademos.org/files/11983/starsolid.gif") #00D repeat-y fixed;
+  }
+
+body {
+background: gray;
+}
